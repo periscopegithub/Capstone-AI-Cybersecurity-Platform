@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-Stop Cybersecurity Assessment Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .index-section {
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+        }
+        .index-title {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff5733;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .index-content {
+            font-size: 1.2em;
+            text-align: center;
+        }
+        .index-normal {
+            font-size: 1em;
+            text-align: left;
+            margin-top: 15px; /* Added margin for spacing */
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .url-input {
+            width: 80%; /* Make the URL input box longer */
+        }
+        .checking-message {
+            color: blue;
+            margin-top: 10px;
+        }
+        .email-textarea {
+            width: 100%;
+            height: 200px; /* Adjust height as needed */
+            resize: vertical; /* Allow vertical resizing */
+        }
+        .table-bordered {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .table-bordered th, .table-bordered td {
+            border: 1px solid brown;
+            text-align: center;
+            padding: 8px;
+        }
+        .table-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .overall-performance {
+            background-color: #d3d3d3;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <header>
+            <h1>One-Stop Cybersecurity Assessment Platform</h1>
+        </header>
+        <section>
+            <p><b>Platform Introduction</b></p>
+            <p>{{ platform_introduction }}</p>
+        </section>
+        <section class="index-section">
+            <div class="index-title">Hong Kong Cybersecurity Index: {{ index_score }}</div>
+            <div class="index-content">Since {{ first_response_date }} and as of {{ current_date_time }}, <b>{{ num_respondents }} enterprises in Hong Kong</b> have participated in this index survey.</div>
+            <div class="index-normal">{{ index_introduction }}</div>
+            <div class="table-title">Overall Performance</div>
+            <table class="table-bordered">
+                <thead>
+                    <tr>
+                        <th>Industry</th>
+                        <th>No. of Respondents</th>
+                        {% for category in industry_tables[0].question_categories %}
+                        <th>{{ category }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="overall-performance">
+                        <td>Overall SurveyPerformance</td>
+                        <td>{{ overall_performance["No. of Respondents"] }}</td>
+                        {% for category in industry_tables[0].question_categories %}
+                        <td>{{ overall_performance[category]|round(1) }}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-title">Average Scores by Industry and Category</div>
+            {% for table in industry_tables %}
+            <table class="table-bordered">
+                <thead>
+                    <tr>
+                        <th>Industry</th>
+                        <th>No. of Respondents</th>
+                        {% for category in table.question_categories %}
+                        <th>{{ category }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for industry, scores in table.industry_scores.items() %}
+                    <tr>
+                        <td>{{ industry }}</td>
+                        <td>{{ scores["No. of Respondents"] }}</td>
+                        {% for category in table.question_categories %}
+                        <td>{{ scores[category]|default('N/A')|round(1) }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </section>
+        <section>
+            <p><b>AI Assessment on Your Cybersecurity Readiness</b></p>
+            <p>{{ ai_assessment_introduction }}</p>
+            <form action="{{ url_for('survey') }}" method="POST">
+                <label for="invitation_code">Enter your invitation code:</label>
+                <input type="text" id="invitation_code" name="invitation_code" required>
+                <button type="submit">Go</button>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div id="error-message" style="color: red;">
+                            {{ messages[0] }}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </form>
+        </section>
+        <section>
+            <p><b>Obtain a Report on Your Country and Industry</b></p>
+            <p>{{ country_industry_report_introduction }}</p>
+            <form id="reportForm" action="{{ url_for('submit_report_request') }}" method="POST" onsubmit="return validateForm()">
+                <label for="country">Select your country:</label>
+                <select id="country" name="country">
+                    <option value="" disabled selected>Country</option>
+                    {% for country in countries %}
+                        <option value="{{ country }}">{{ country }}</option>
+                    {% endfor %}
+                </select>
+                <label for="industry">Select your industry:</label>
+                <select id="industry" name="industry">
+                    <option value="" disabled selected>Industry</option>
+                    {% for industry in industries %}
+                        <option value="{{ industry }}">{{ industry }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Get Report</button>
+                <div id="formErrorMessage" class="error-message"></div>
+            </form>
+        </section>
+        <section>
+            <p><b>Cyber Threat Trends</b></p>
+            <p>(Monitoring source: <b>@dexpose_io</b> on X.com)</p>
+            <p>{{ cyber_threat_trends_introduction }}</p>
+            <p>Over the <b>past 90 days</b>, we have detected <b>{{ num_ransom_attacks }} ransom attacks</b> and <b>{{ num_data_breaches }} data breach incidents</b> globally.</p>
+            <p>The top 3 most prominent ransomware / ransom groups during the period are:</p>
+            <ol>
+                <li><b>{{ top_ransomware_1 }}</b> ({{ top_ransomware_count_1 }} incidents)</li>
+                <li><b>{{ top_ransomware_2 }}</b> ({{ top_ransomware_count_2 }} incidents)</li>
+                <li><b>{{ top_ransomware_3 }}</b> ({{ top_ransomware_count_3 }} incidents)</li>
+            </ol>
+        </section>
+        <section>
+            <p><b>Phishing Prevention</b></p>
+            <p>{{ phishing_prevention_introduction }}</p>
+            <section>
+                <p><b>Suspicious Email Detector</b></p>
+                <p>{{ suspicious_email_detector_introduction }}</p>
+                <form id="emailForm" action="{{ url_for('check_email') }}" method="POST">
+                    <label for="email">Copy and paste email message below:</label>
+                    <textarea id="email" name="email" required class="email-textarea"></textarea>
+                    <button type="submit">Check Email</button>
+                </form>
+                <div id="emailCheckResult" class="error-message"></div>
+                <div id="emailCheckingMessage" class="checking-message" style="display: none;">Checking...</div>
+            </section>
+            <section>
+                <p><b>Suspicious Website Detector</b></p>
+                <p>{{ suspicious_website_detector_introduction }}</p>
+                <form id="urlForm" action="{{ url_for('check_url') }}" method="POST">
+                    <label for="url">Enter a URL:</label>
+                    <input type="text" id="url" name="url" required class="url-input">
+                    <button type="submit">Check URL</button>
+                </form>
+                <div id="urlCheckResult" class="error-message"></div>
+                <div id="checkingMessage" class="checking-message" style="display: none;">Checking...</div>
+            </section>
+        </section>
+    </div>
+
+    <script>
+        function validateForm() {
+            const country = document.getElementById("country").value;
+            const industry = document.getElementById("industry").value;
+            const errorMessage = document.getElementById("formErrorMessage");
+
+            if (!country || !industry) {
+                errorMessage.textContent = "Please select both your country and industry.";
+                return false;
+            }
+
+            errorMessage.textContent = "";
+            return true;
+        }
+
+        document.getElementById('urlForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const url = document.getElementById('url').value;
+            const resultDiv = document.getElementById('urlCheckResult');
+            const checkingMessage = document.getElementById('checkingMessage');
+            
+            resultDiv.textContent = ""; // Clear the message when the form is submitted
+            checkingMessage.style.display = "block"; // Show the checking message
+
+            fetch('{{ url_for("check_url") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                checkingMessage.style.display = "none"; // Hide the checking message
+                resultDiv.textContent = data.message;
+            })
+            .catch(error => {
+                checkingMessage.style.display = "none"; // Hide the checking message
+                console.error('Error:', error);
+                resultDiv.textContent = 'An error occurred while checking the URL.';
+            });
+        });
+
+        document.getElementById('url').addEventListener('input', function() {
+            document.getElementById('urlCheckResult').textContent = ""; // Clear the message when the input box is clicked or modified
+        });
+
+        document.getElementById('emailForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const resultDiv = document.getElementById('emailCheckResult');
+            const checkingMessage = document.getElementById('emailCheckingMessage');
+            
+            resultDiv.textContent = ""; // Clear the message when the form is submitted
+            checkingMessage.style.display = "block"; // Show the checking message
+
+            fetch('{{ url_for("check_email") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                checkingMessage.style.display = "none"; // Hide the checking message
+                resultDiv.textContent = data.message;
+            })
+            .catch(error => {
+                checkingMessage.style.display = "none"; // Hide the checking message
+                console.error('Error:', error);
+                resultDiv.textContent = 'An error occurred while checking the email.';
+            });
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            document.getElementById('emailCheckResult').textContent = ""; // Clear the message when the input box is clicked or modified
+        });
+    </script>
+</body>
+</html>
