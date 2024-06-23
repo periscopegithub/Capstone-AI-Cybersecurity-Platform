@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .thank-you-container, .thank-you-container * {
+                visibility: visible;
+            }
+            .thank-you-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                height: auto; /* Ensure the height is auto for printing */
+                overflow: visible; /* Ensure overflow is visible */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="thank-you-container">
+        <header>
+            {% if not from_welcome %}
+                <h1>Thank You for Completing the Survey! Here's your assessment report.</h1>
+            {% endif %}
+            <button onclick="goBack()">Back to Welcome Page</button>
+            <button onclick="printReport()">Print Report</button>
+        </header>
+
+        {% if not from_welcome %}
+            <section class="section">
+                <h2 class="section-heading">Your Overall Scores and Comparison</h2>
+                <p>{{ overall_score_message }}</p>
+                <div class="detailed-results" id="detailed-results">
+                    <ul>
+                        {% for category, message in detailed_results.items() %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-heading">Your Industry Scores and Comparison</h2>
+                <p>{{ industry_score_message }}</p>
+                <div class="detailed-results" id="industry-detailed-results">
+                    <ul>
+                        {% for category, message in industry_detailed_results.items() %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-heading">AI Feedback on Your Cyber Security Readiness</h2>
+                <article class="section-comments" id="section-comments">
+                    <p>Loading AI feedback...</p>
+                    <ul id="comments-list"></ul>
+                </article>
+            </section>
+        {% endif %}
+
+        {% if country != 'Hong Kong' %}
+            <section class="section">
+                <h2 class="section-heading">Your Country's Standing in GCI</h2>
+                <article class="gci-insights" id="gci-insights">
+                    <p>Loading AI insights...</p>
+                </article>
+            </section>
+
+            <section class="section">
+                <h2 class="section-heading">Your Country's Standing in NCSI</h2>
+                <article class="ncsi-insights" id="ncsi-insights">
+                    <p>Loading AI insights...</p>
+                </article>
+            </section>
+
+            <section class="section">
+                <h2 class="section-heading">Cyber Threat Situation in Your Country</h2>
+                <article class="country-situation" id="country-situation">
+                    <p>Loading AI analysis...</p>
+                </article>
+            </section>
+        {% endif %}
+
+        <section class="section">
+            <h2 class="section-heading">Cyber Threat Situation in Your Industry</h2>
+            <article class="industry-situation" id="industry-situation">
+                <p>Loading AI analysis...</p>
+            </article>
+        </section>
+
+        <footer class="section">
+            <h2 class="section-heading">Disclaimer</h2>
+            <div class="disclaimer">
+                <p>{{ disclaimer }}</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = "/welcome";  // Change to the actual URL of your welcome page
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof marked !== 'undefined') {
+                var commentElements = document.querySelectorAll('.comment-markdown');
+                commentElements.forEach(function(element) {
+                    try {
+                        element.innerHTML = marked.parse(element.textContent.trim());
+                    } catch (error) {
+                        console.error('Error parsing markdown content:', error);
+                        element.innerHTML = element.textContent.trim();
+                    }
+                });
+            } else {
+                console.warn('Marked library not loaded. Comments are not formatted.');
+            }
+
+            // Polling for task completion
+            var taskId = "{{ task_id }}";
+            var pollInterval = setInterval(function() {
+                fetch(`/check_task/${taskId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'SUCCESS') {
+                            clearInterval(pollInterval);
+                            // Update the page with the results
+                            if (data.section_comments) {
+                                document.querySelector('.section-comments').innerHTML = marked.parse(data.section_comments.join("\n"));
+                            }
+                            if (data.country_situation) {
+                                document.querySelector('.country-situation').innerHTML = `<p>${data.country_situation}</p>`;
+                            }
+                            if (data.industry_situation) {
+                                document.querySelector('.industry-situation').innerHTML = `<p>${data.industry_situation}</p>`;
+                            }
+                            if (data.ncsi_standing) {
+                                document.querySelector('.ncsi-insights').innerHTML = `<p>${data.ncsi_standing}</p>`;
+                            }
+                            if (data.gci_standing) {
+                                document.querySelector('.gci-insights').innerHTML = `<p>${data.gci_standing}</p>`;
+                            }
+
+                            // Parse markdown for the new comments
+                            var newCommentElements = document.querySelectorAll('.comment-markdown');
+                            newCommentElements.forEach(function(element) {
+                                try {
+                                    element.innerHTML = marked.parse(element.textContent.trim());
+                                } catch (error) {
+                                    console.error('Error parsing markdown content:', error);
+                                    element.innerHTML = element.textContent.trim();
+                                }
+                            });
+                        } else if (data.status === 'FAILURE') {
+                            clearInterval(pollInterval);
+                            document.querySelector('.section-comments').innerHTML = "An error occurred while processing your request.";
+                        }
+                    });
+            }, 5000);  // Poll every 5 seconds
+        });
+    </script>
+</body>
+</html>
