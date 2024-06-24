@@ -4,11 +4,11 @@ import time
 from dotenv import load_dotenv
 from llama_index.core import Settings
 from llama_index.postprocessor.flag_embedding_reranker import FlagEmbeddingReranker
-from llama_index.llms.ollama import Ollama as OllamaIndex
+from llama_index.llms.ollama import Ollama as llama_index_Ollama
 from llama_index.llms.azure_openai import AzureOpenAI
 from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
 from langchain.schema import HumanMessage, SystemMessage
-from langchain_community.llms import Ollama
+from langchain_community.llms import Ollama as langchain_Ollama
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 
@@ -19,28 +19,16 @@ logger = logging.getLogger(__name__)
 # Load API keys and configurations from .env file as environment variables
 load_dotenv()
 
-# Initialize Llama3 run locally
-llama3 = Ollama(model="llama3")
 
-ollamaindex_llama3 = OllamaIndex(model="llama3")
-
-# azure_llm = AzureOpenAI(
-#     model=os.environ.get("AZURE_OPENAI_MODEL"),
-#     deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_GPT35TURBO"),
-#     api_key=os.environ.get("AZURE_OPENAI_KEY"),
-#     azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
-#     api_version=os.environ.get("AZURE_OPENAI_VERSION"),
-# )
-
-Settings.llm = ollamaindex_llama3
-
-Settings.embed_model = AzureOpenAIEmbedding(
-    model=os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL"),
-    deployment_name=os.environ.get("AZURE_OPENAI_EMBEDDING_DEPLOYMENT"),
+azure_llm = AzureOpenAI(
+    model=os.environ.get("AZURE_OPENAI_MODEL"),
+    deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_GPT4"),
     api_key=os.environ.get("AZURE_OPENAI_KEY"),
     azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
     api_version=os.environ.get("AZURE_OPENAI_VERSION"),
 )
+
+Settings.llm = azure_llm
 
 
 # Load data from the given file path
@@ -60,7 +48,7 @@ def load_data(filepath):
 
 # Generate ITU insights for a specific country
 def gci_insights(country):
-    base_nodes, objects, recursive_index = load_data("./GCI report/ITU-20240619-2.pkl")
+    base_nodes, objects, recursive_index = load_data("./GCI report/ITU-20240624.pkl")
     if not base_nodes or not objects or not recursive_index:
         logger.error("Failed to load data. Exiting...")
         return
@@ -79,12 +67,11 @@ def gci_insights(country):
     queries = [
         "Provide a brief introduction to Global Cybersecurity Index (GCI).",
         "Summarize the five pillars of GCI.",
-        f"What is the score of {country}?",
+        f"What is the global score of {country}?",
     ]
 
     def process_query(query):
         try:
-            # time.sleep(15)
             response = recursive_query_engine.query(query)
             return response.response
         except Exception as e:
@@ -108,13 +95,16 @@ def gci_insights(country):
     for response in responses:
         logger.info(response)
 
+    # Initialize Llama3 running locally to summarize the responses
+    lc_llama3 = langchain_Ollama(model="llama3")
+
     input_text = " ".join(responses)
     summary_prompt = f"""You are a cyber security expert and is studying the Global Cybersecurity Index (GCI).
     Given the below information, write a brief (within 5 sentences) with some insights into GCI index and {country}'s index standing.
     Use a formal tone. 
     Start with "According to the latest Global Cybersecurity Index (GCI),"."""
 
-    output = llama3.invoke(
+    output = lc_llama3.invoke(
         [
             SystemMessage(content=summary_prompt),
             HumanMessage(content=input_text),
@@ -122,3 +112,6 @@ def gci_insights(country):
     )
     print(output)
     return output
+
+
+# output = gci_insights("UNITED STATES")
