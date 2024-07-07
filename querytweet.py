@@ -81,16 +81,16 @@ def country_stats(country):
     ]
 
     responses = []
-    # for query in queries:
-    #     time.sleep(15)
-    #     response = csv_agent.invoke(
-    #         [
-    #             SystemMessage(content=prompt),
-    #             HumanMessage(content=query),
-    #         ]
-    #     )
-    #     print(response)
-    #     responses.append(response["output"])
+    for query in queries:
+        time.sleep(15)
+        response = csv_agent.invoke(
+            [
+                SystemMessage(content=prompt),
+                HumanMessage(content=query),
+            ]
+        )
+        print(response)
+        responses.append(response["output"])
 
     input_text = """
     Given the below information, write a brief summary on the cyber threat situation in his country.
@@ -118,16 +118,16 @@ def industry_stats(industry):
     ]
 
     responses = []
-    # for query in queries:
-    #     time.sleep(15)
-    #     response = csv_agent.invoke(
-    #         [
-    #             SystemMessage(content=prompt),
-    #             HumanMessage(content=query),
-    #         ]
-    #     )
-    #     print(response)
-    #     responses.append(response["output"])
+    for query in queries:
+        time.sleep(15)
+        response = csv_agent.invoke(
+            [
+                SystemMessage(content=prompt),
+                HumanMessage(content=query),
+            ]
+        )
+        print(response)
+        responses.append(response["output"])
 
     input_text = """Given the below information, write a brief summary on the cyber threat situation in his industry.
     Use a formal tone. 
