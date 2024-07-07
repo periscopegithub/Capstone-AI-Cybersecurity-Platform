@@ -1,1 +1,1 @@
-suspicious_website_detector_introduction
+Protect your browsing with our Suspicious URL Detector. Simply input any URL, and our machine learning models will quickly analyze and identify potential phishing threats. Stay safe online with real-time URL security checks.

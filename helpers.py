@@ -30,8 +30,10 @@ def load_invitation_codes():
 
 def load_text(file_name):
     TEXT_FOLDER = "texts"
-    with open(os.path.join(TEXT_FOLDER, file_name)) as f:
-        return f.read()
+    with open(os.path.join(TEXT_FOLDER, file_name), encoding="utf-8") as f:
+        return f.read().replace("\n", "<br>")
+
+
 
 
 def get_current_datetime():
@@ -292,21 +294,21 @@ def get_first_response_datetime():
     return today_local
 
 
-def calculate_industry_scores():
-    responses_df = pd.read_csv('Responses/all_responses.csv')
-    questions_df = pd.read_excel('Questionnaire.xlsx')
+# def calculate_industry_scores():
+#     responses_df = pd.read_csv('Responses/all_responses.csv')
+#     questions_df = pd.read_excel('Questionnaire.xlsx')
 
-    question_categories = questions_df['Question Category'].unique().tolist()
+#     question_categories = questions_df['Question Category'].unique().tolist()
 
-    industry_scores = {}
+#     industry_scores = {}
 
-    industries = responses_df['Industry'].unique()
-    for industry in industries:
-        industry_data = responses_df[responses_df['Industry'] == industry]
-        overall_score = industry_data['Overall Score'].mean()
-        category_scores = {}
-        for category in question_categories:
-            category_scores[category] = industry_data[category].mean()
-        industry_scores[industry] = {'Overall Score': overall_score, **category_scores}
+#     industries = responses_df['Industry'].unique()
+#     for industry in industries:
+#         industry_data = responses_df[responses_df['Industry'] == industry]
+#         overall_score = industry_data['Overall Score'].mean()
+#         category_scores = {}
+#         for category in question_categories:
+#             category_scores[category] = industry_data[category].mean()
+#         industry_scores[industry] = {'Overall Score': overall_score, **category_scores}
 
-    return industry_scores, question_categories
+#     return industry_scores, question_categories

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One-Stop Cybersecurity Assessment Platform</title>
+    <title>Hong Kong Cybersecurity Assessment & Advisory Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .index-section {
@@ -69,11 +69,11 @@
 <body>
     <div class="welcome-container">
         <header>
-            <h1>One-Stop Cybersecurity Assessment Platform</h1>
+            <h1>Hong Kong Cybersecurity Assessment & Advisory Platform</h1>
         </header>
         <section class="section">
             <p><b>Platform Introduction</b></p>
-            <p>{{ platform_introduction }}</p>
+            <p>{{ platform_introduction|safe }}</p>
         </section>
         <section class="index-section">
             <div class="index-title">Hong Kong Cybersecurity Index: {{ index_score }}</div>
@@ -128,7 +128,7 @@
         </section>
         <section class="section">
             <p><b>AI Assessment on Your Cybersecurity Readiness</b></p>
-            <p>{{ ai_assessment_introduction }}</p>
+            <p>{{ ai_assessment_introduction|safe }}</p>
             <form action="{{ url_for('survey') }}" method="POST">
                 <label for="invitation_code">Enter your invitation code:</label>
                 <input type="text" id="invitation_code" name="invitation_code" required>
@@ -144,7 +144,7 @@
         </section>
         <section class="section">
             <p><b>Obtain a Report on Your Country and Industry</b></p>
-            <p>{{ country_industry_report_introduction }}</p>
+            <p>{{ country_industry_report_introduction|safe }}</p>
             <form id="reportForm" action="{{ url_for('submit_report_request') }}" method="POST" onsubmit="return validateForm()">
                 <label for="country">Select your country:</label>
                 <select id="country" name="country">
@@ -167,7 +167,7 @@
         <section class="section">
             <p><b>Cyber Threat Trends</b></p>
             <p>(Monitoring source: <b>@dexpose_io</b> on X.com)</p>
-            <p>{{ cyber_threat_trends_introduction }}</p>
+            <p>{{ cyber_threat_trends_introduction|safe }}</p>
             <p>Over the <b>past 90 days</b>, we have detected <b>{{ num_ransom_attacks }} ransom attacks</b> and <b>{{ num_data_breaches }} data breach incidents</b> globally.</p>
             <p>The top 3 most prominent ransomware / ransom groups during the period are:</p>
             <ol>
@@ -178,10 +178,10 @@
         </section>
         <section class="section">
             <p><b>Phishing Prevention</b></p>
-            <p>{{ phishing_prevention_introduction }}</p>
+            <p>{{ phishing_prevention_introduction|safe }}</p>
             <section class="section">
                 <p><b>Suspicious Email Detector</b></p>
-                <p>{{ suspicious_email_detector_introduction }}</p>
+                <p>{{ suspicious_email_detector_introduction|safe }}</p>
                 <form id="emailForm" action="{{ url_for('check_email') }}" method="POST">
                     <label for="email">Copy and paste email message below:</label>
                     <textarea id="email" name="email" required class="email-textarea"></textarea>
@@ -192,7 +192,7 @@
             </section>
             <section class="section">
                 <p><b>Suspicious Website Detector</b></p>
-                <p>{{ suspicious_website_detector_introduction }}</p>
+                <p>{{ suspicious_website_detector_introduction|safe }}</p>
                 <form id="urlForm" action="{{ url_for('check_url') }}" method="POST">
                     <label for="url">Enter a URL:</label>
                     <input type="text" id="url" name="url" required class="url-input">

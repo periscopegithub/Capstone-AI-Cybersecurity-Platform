@@ -1,1 +1,1 @@
-suspicious_email_detector_introduction
+Guard against email threats with our Suspicious Email Detector. Copy and paste your email message into our tool, and our fine-tuned AI will detect and flag potential spam and phishing attempts. Keep your inbox secure with instant email threat analysis.

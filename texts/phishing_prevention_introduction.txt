@@ -1,1 +1,6 @@
-phishing_prevention_introduction
+Safeguard your organization with our comprehensive Phishing Prevention tools. This section includes:
+
+- Suspicious URL Detector: Quickly analyze URLs for potential phishing threats. Simply input any URL, and our machine learning models will provide real-time security checks.
+- Suspicious Email Detector: Detect and flag potential spam and phishing emails. Copy and paste your email message, and our AI will instantly identify threats.
+
+Enhance your cybersecurity with our easy-to-use tools designed to keep your browsing and email communications secure.
