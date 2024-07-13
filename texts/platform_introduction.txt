@@ -1,4 +1,4 @@
-Welcome to Hong Kong Cybersecurity Assessment & Advisory Platform, your all-in-one tool for enhancing your organization's cybersecurity. Our platform offers:
+Welcome to Hong Kong Corporate Cybersecurity Platform, your all-in-one tool for enhancing your organization's cybersecurity. Our platform offers:
 
 1. Comprehensive Assessments: Complete a detailed cybersecurity survey.
 2. AI-Powered Insights: Get real-time, personalized recommendations.

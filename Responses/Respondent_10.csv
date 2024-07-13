@@ -1,0 +1,10 @@
+Question ID,Category,Subcategory,Question Text,Score,Score Description
+1.1,Inventory and Control,Enterprise Asset,"Do you maintain an accurate, detailed, and up-to-date inventory of all enterprise assets?",4,"Comprehensive inventory, updated regularly"
+1.2,Inventory and Control,Software Asset,"Do you have a comprehensive inventory of all software, including operating systems and applications?",3,"Comprehensive inventory, updated irregularly"
+2.1,Data Protection,Data Classification,Do you classify data based on its sensitivity and business impact?,4,"Standardized classification, consistently applied"
+2.2,Data Protection,Data Encryption,Is sensitive data encrypted both at rest and in transit?,4,"Standardized encryption, consistently applied"
+3.1,Secure Configuration,Configuration Management,Do you establish and maintain secure configuration settings for all enterprise assets and software?,4,"Standardized configuration management, consistently applied"
+3.2,Secure Configuration,Configuration Monitoring,Do you regularly monitor and update configurations to maintain security over time?,3,"Regular monitoring, but not comprehensive"
+4.1,Access Control,User Account Management,"Do you have processes to assign and manage user accounts, including administrator and service accounts?",2,"Basic account management, not standardized"
+4.2,Access Control,Access Control Policies,Are access control policies enforced to ensure that users have appropriate access based on their roles?,4,"Standardized policies, consistently applied"
+4.3,Access Control,Multi-Factor Authentication,Is MFA implemented for accessing critical systems and sensitive data?,1,No MFA
